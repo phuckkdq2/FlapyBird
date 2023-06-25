@@ -3,20 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameController : MonoBehaviour
+public class GameController : Darwin
 {
-    public GameObject pipe ;
-    public float spawntime; 
-    bool m_isGameOver ;
-    int m_score;
-    UIManager m_ui;
-    // Start is called before the first frame update
+    [SerializeField] protected PipeSpawner pipeSpawner;
+    public static GameController Instance { get => instance;}
+    [SerializeField] bool m_isGameOver ;
+    [SerializeField] int m_score;
+    [SerializeField] UIManager m_ui;
+
+    private static GameController instance;
+    
+          
+    private void Awake() {
+        GameController.instance = this;
+    }
     void Start()
     {   
-        m_score = 0;
-        m_ui = FindObjectOfType<UIManager>();
-        m_ui.ShowHomeGui(true);
+        this.m_score = 0;
+        this.m_ui.ShowHomeGui(true);
         Time.timeScale = 0f;
+    }
+
+    protected override void LoadComponent()
+    {
+        base.LoadComponent();
+        this.LoadUIManager();
+        this.LoadPipeSpawner();
+    }
+
+    protected virtual void LoadUIManager()
+    {
+        if(this.m_ui != null) return;
+        this.m_ui = GameObject.FindObjectOfType<UIManager>();
+    }
+
+     protected virtual void LoadPipeSpawner()
+    {
+        if(this.pipeSpawner != null) return;
+        this.pipeSpawner = transform.GetComponent<PipeSpawner>();
     }
 
     public void GamePlay(){
@@ -24,40 +48,26 @@ public class GameController : MonoBehaviour
         
         StartCoroutine(PlayingGame());
         Time.timeScale = 1f;
-        
-
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(m_isGameOver ){
             Time.timeScale = 0f;
-            m_ui.ShowGameOver();
-                                
-        }
-        
+            m_ui.ShowGameOver();                           
+        } 
     }
 
     IEnumerator PlayingGame(){
         while(!m_isGameOver){
-            yield return new WaitForSeconds(2f);
-            SpawnPipe();
+            yield return new WaitForSeconds(1.2f);
+            pipeSpawner.SpawnPipe();
             }
     }
 
-    public void SpawnPipe(){
-        float randYpos = Random.Range(-2f, 2f);
-        Vector2 spanwPipex = new Vector2(4f , randYpos);
-        if(pipe){
-            Instantiate(pipe , spanwPipex, Quaternion.identity);
-        }
-        
-    }
 
     public void SetGameOverState(bool state){
-        m_isGameOver = state;
-            
+        m_isGameOver = state;     
     }
 
     public bool IsGameOver(){    
@@ -80,8 +90,7 @@ public class GameController : MonoBehaviour
         m_ui.ShowScore("SCORE : " + m_score);
     }
 
-    public void Replay(){
-        
+    public void Replay(){    
         SceneManager.LoadScene("GamePlay");
     }
     

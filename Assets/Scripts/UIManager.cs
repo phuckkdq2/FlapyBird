@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.UI; 
 using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Darwin
 {
-    public Text scoreText ;
-    public GameObject gameOverGui;
-    public GameObject HomeGui;
-    public GameObject GameGui;
+    [SerializeField] public Text scoreText ;
+    [SerializeField] public GameObject gameOverGui;
+    [SerializeField] public GameObject HomeGui;
+    [SerializeField] public GameObject GameGui;  
 
     public void ShowScore(string text){
         if(scoreText){
@@ -25,10 +25,10 @@ public class UIManager : MonoBehaviour
             GameGui.SetActive(!isShow);
         }
     }
+
     public void ShowGameOver(){
         if(gameOverGui){
-            gameOverGui.SetActive(true);
-            
+            gameOverGui.SetActive(true);   
         }
     }
 }

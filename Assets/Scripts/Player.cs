@@ -2,34 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Darwin
 {
-    Rigidbody2D m_rb;
-    GameController m_gc;
+    [SerializeField] Rigidbody2D m_rb;
+    [SerializeField] public AudioSource aus;
+    [SerializeField] public AudioClip flap;
+    [SerializeField] public AudioClip hit;
+    [SerializeField] public AudioClip die ;
+    [SerializeField] public AudioClip score;
 
-    public AudioSource aus;
-    public AudioClip flap;
-    public AudioClip hit;
-    public AudioClip die ;
-    public AudioClip score;
-
-    public float bouncingForce; // lực nảy 
+    [SerializeField] public float bouncingForce; // lực nảy 
 
     // Start is called before the first frame update
     void Start()
     {
-        m_gc = FindObjectOfType<GameController>();
         m_rb = GetComponent<Rigidbody2D>();
-
     }
 
-    // Update is called once per frame
+    protected override void LoadComponent()
+    {
+        base.LoadComponent();
+        this.LoadRigidbody();
+    }
+    
+    protected virtual void LoadRigidbody()
+    {
+        if(m_rb != null) return;
+        this.m_rb = transform.GetComponent<Rigidbody2D>();
+    }  
+
     void Update()
     {
-        if(m_gc.IsGameOver()){
+        if(GameController.Instance.IsGameOver()){
             return;
         }
-
         if(Input.GetMouseButtonDown(0)){
             m_rb.AddForce(Vector2.up * bouncingForce );
             if(aus && flap){
@@ -40,12 +46,12 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) {
 
-        if(m_gc.IsGameOver()){
+        if(GameController.Instance.IsGameOver()){
             return;
         }
         
         if(other.CompareTag("Pass")){
-            m_gc.ScoreIncrement();
+            GameController.Instance.ScoreIncrement();
             if(aus&&score){
                 aus.PlayOneShot(score);
             }
@@ -54,24 +60,19 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("floor")){
-            m_gc.SetGameOverState(true);
+            GameController.Instance.SetGameOverState(true);
             if(aus&&hit && die){
                 aus.PlayOneShot(hit);
                 aus.PlayOneShot(die);
-            } 
-            
+            }     
         }
 
-        if(other.gameObject.CompareTag("Pipe")){
-            
-            m_gc.SetGameOverState(true);    
+        if(other.gameObject.CompareTag("Pipe")){         
+            GameController.Instance.SetGameOverState(true);    
             if(aus&&hit&& die){
                 aus.PlayOneShot(hit);
                 aus.PlayOneShot(die);
             } 
-            
         }
-
     }
-
 }

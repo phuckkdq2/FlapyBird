@@ -4,20 +4,11 @@ using UnityEngine;
 
 public class Floor : MonoBehaviour
 {
-    public float moveSpeed;
-    GameController m_gc;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        m_gc = FindObjectOfType<GameController>();
-    
-    }
+    [SerializeField] protected float moveSpeed;
 
-    // Update is called once per frame
     void Update()
     {
-        if(m_gc.IsGameOver()) return;
+        if(GameController.Instance.IsGameOver()) return;
 
         transform.position = transform.position + Vector3.left * moveSpeed * Time.deltaTime;
         if(transform.position.x <= -5.5f){
